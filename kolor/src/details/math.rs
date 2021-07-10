@@ -1,5 +1,8 @@
 use std::ops::{Add, Div, Mul, MulAssign, Sub};
 
+#[cfg(feature = "serde1")]
+use serde::{Deserialize, Serialize};
+
 #[cfg(not(feature = "f64"))]
 type FType = f32;
 #[cfg(feature = "f64")]

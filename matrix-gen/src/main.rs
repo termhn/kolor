@@ -1,5 +1,5 @@
 use kolor::details::conversion::LinearColorConversion;
-use kolor_64 as kolor;
+use kolor;
 
 fn main() {
     let mut conversions = Vec::new();

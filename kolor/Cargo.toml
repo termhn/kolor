@@ -7,13 +7,11 @@ description = "Color conversions for games & interactive applications."
 keywords = ["game", "color", "colors", "graphics", "rgb"]
 categories = ["graphics", "computer-vision"]
 repository = "https://github.com/kabergstrom/kolor"
-readme = "../../README.md"
+readme = "../README.md"
 license = "MIT OR Apache-2.0"
 
 [lib]
 name = "kolor"
-path = "../../src/lib.rs"
-required-features = ["f32"]
 
 [dependencies]
 serde = { optional = true, version = "1", features = ["derive"] }
@@ -24,5 +22,6 @@ default = ["color-matrices", "f32", "std"]
 serde1 = ["serde"]
 color-matrices = []
 f32 = []
+f64 = []
 std = []
 libm = ["num-traits", "num-traits/libm"]
