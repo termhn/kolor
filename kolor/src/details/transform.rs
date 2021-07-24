@@ -9,10 +9,13 @@ use num_traits::Float;
 /// [ColorTransform] represents a reference to a function that can apply a [TransformFn]
 /// or its inverse.
 #[derive(Copy, Clone)]
+#[cfg(not(target_arch = "spirv"))]
 pub struct ColorTransform {
     first: for<'r> fn(Vec3, WhitePoint) -> Vec3,
     second: Option<for<'r> fn(Vec3, WhitePoint) -> Vec3>,
 }
+
+#[cfg(not(target_arch = "spirv"))]
 impl ColorTransform {
     #[inline]
     pub fn new(src_transform: TransformFn, dst_transform: TransformFn) -> Option<Self> {

@@ -1,11 +1,14 @@
+#[cfg(not(target_arch = "spirv"))]
 use super::{conversion::ColorConversion, transform::ColorTransform};
+
 use crate::{FType, Vec3};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// A [TransformFn] identifies an invertible mapping of colors in a linear [ColorSpace].
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
+#[repr(u32)]
+#[derive(Copy, Clone, PartialEq, Hash, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 pub enum TransformFn {
@@ -57,8 +60,9 @@ impl TransformFn {
     pub const ENUM_COUNT: TransformFn = TransformFn::ICtCp_HLG;
 }
 /// [RGBPrimaries] is a set of primary colors picked to define an RGB color space.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
+#[repr(u32)]
+#[derive(Copy, Clone, PartialEq, Hash, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 pub enum RGBPrimaries {
@@ -107,8 +111,9 @@ impl RGBPrimaries {
 /// A [WhitePoint] defines the color "white" in an RGB color system.
 /// White points are derived from an "illuminant" which are defined
 /// as some reference lighting condition based on a Spectral Power Distribution.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
+#[repr(u32)]
+#[derive(Copy, Clone, PartialEq, Hash, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 pub enum WhitePoint {
@@ -184,7 +189,9 @@ impl WhitePoint {
 ///
 /// Non-linear [ColorSpace]s - such as sRGB with gamma compensation applied - are defined as a non-linear mapping from a linear
 /// [ColorSpace]'s coordinate system.
-#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
+#[derive(Copy, Clone, PartialEq, Hash, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[repr(C)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct ColorSpace {
     primaries: RGBPrimaries,
@@ -429,8 +436,9 @@ pub mod color_spaces {
 }
 
 /// [Color] is a 3-component vector defined in a [ColorSpace].
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct Color {
     pub value: Vec3,
     pub space: ColorSpace,
@@ -455,6 +463,7 @@ impl Color {
     }
 
     /// Returns a [Color] with this color converted into the provided [ColorSpace].
+    #[cfg(not(target_arch = "spirv"))]
     pub fn to(&self, space: ColorSpace) -> Color {
         let conversion = ColorConversion::new(self.space, space);
         let new_color = conversion.convert(self.value);
@@ -463,6 +472,8 @@ impl Color {
             value: new_color,
         }
     }
+
+    #[cfg(not(target_arch = "spirv"))]
     pub fn to_linear(&self) -> Color {
         if self.space.is_linear() {
             *self

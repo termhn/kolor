@@ -1,15 +1,22 @@
 use super::{
-    color::{RGBPrimaries, TransformFn},
-    transform::ColorTransform,
+    color::RGBPrimaries,
     xyz::{rgb_to_xyz, xyz_to_rgb},
 };
+
+#[cfg(not(target_arch = "spirv"))]
+use super::{
+    color::TransformFn,
+    transform::ColorTransform
+};
+
 use crate::{ColorSpace, FType, Mat3, Vec3};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// A transformation from one linear color space to another.
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
 pub struct LinearColorConversion {
     mat: Mat3,
     input_space: ColorSpace,
@@ -32,10 +39,16 @@ impl LinearColorConversion {
 
     pub fn new(src: ColorSpace, dst: ColorSpace) -> Self {
         if !src.is_linear() {
+            #[cfg(not(target_arch = "spirv"))]
             panic!("{:?} is not a linear color space", src);
+            #[cfg(target_arch = "spirv")]
+            panic!("src space is not linear");
         }
         if !dst.is_linear() {
-            panic!("{:?} is not a linear color space", dst);
+            #[cfg(not(target_arch = "spirv"))]
+            panic!("{:?} is not a linear color space", src);
+            #[cfg(target_arch = "spirv")]
+            panic!("dst space is not linear");
         }
         #[cfg(feature = "color-matrices")]
         let const_conversion = super::generated_matrices::const_conversion_matrix(
@@ -81,6 +94,7 @@ impl LinearColorConversion {
 
 /// [ColorConversion] defines an operation that maps a 3-component vector
 /// from a source [ColorSpace] to a destination [ColorSpace].
+#[cfg(not(target_arch = "spirv"))]
 #[derive(Copy, Clone)]
 pub struct ColorConversion {
     src_space: ColorSpace,
@@ -89,11 +103,15 @@ pub struct ColorConversion {
     linear_transform: Option<LinearColorConversion>,
     dst_transform: Option<ColorTransform>,
 }
+
+#[cfg(not(target_arch = "spirv"))]
 impl PartialEq for ColorConversion {
     fn eq(&self, other: &Self) -> bool {
         self.src_space == other.src_space && self.dst_space == other.dst_space
     }
 }
+
+#[cfg(not(target_arch = "spirv"))]
 impl core::fmt::Debug for ColorConversion {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let src_transform = if !self.src_space.is_linear() {
@@ -116,6 +134,7 @@ impl core::fmt::Debug for ColorConversion {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl ColorConversion {
     pub fn new(src: ColorSpace, dst: ColorSpace) -> Self {
         let src_transform = if !src.is_linear() {

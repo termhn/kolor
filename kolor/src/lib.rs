@@ -151,4 +151,5 @@ pub use details::color::color_spaces as spaces;
 #[doc(inline)]
 pub use details::color::{Color, ColorSpace};
 #[doc(inline)]
+#[cfg(not(target_arch = "spirv"))]
 pub use details::conversion::ColorConversion;
