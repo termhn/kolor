@@ -1093,6 +1093,7 @@ pub const ADOBE_WIDE_D50_TO_ADOBE_1998_D65: Mat3 = const_mat3!([
     -0.002173991233517858, -0.08223848261534872, 1.03664814908986,
 ]);
 
+#[cfg(not(target_arch = "spirv"))]
 pub fn const_conversion_matrix(
     src_primaries: RGBPrimaries,
     src_wp: WhitePoint,

@@ -17,12 +17,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug))]
+#[cfg(not(target_arch = "spirv"))]
 pub struct LinearColorConversion {
     mat: Mat3,
     input_space: ColorSpace,
     output_space: ColorSpace,
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl LinearColorConversion {
     pub fn input_space(&self) -> ColorSpace {
         self.input_space
